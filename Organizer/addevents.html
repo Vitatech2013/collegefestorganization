@@ -1,0 +1,393 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<style>
+    .form-control {
+        border-radius: 15px;
+    }
+</style>
+
+<body onload="loadData()" style="font-family: verdena;">
+<form onsubmit="addEvent()">
+    <div class="row">
+        <h3 style="text-align: center"><b>Add Events</b></h3>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Fest Name</label>
+        </div>
+        <div class="col-sm-3">
+            <select id="festname" class="form-control"required>
+                <option value="">--select--</option>
+            </select>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Event Name</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="ename" id="eventname" class="form-control" placeholder="enter event name" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Event Date</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="date" name="date" id="date" class="form-control" placeholder="" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Time</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="time" name="time" id="time" class="form-control" placeholder="enter time" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Co-Ordinater 1</label>
+        </div>
+        <div class="col-sm-3">
+            <select id="coordinater1" class="form-control"required>
+                <option value="">--select--</option>
+            </select>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Co-Ordinater 2</label>
+        </div>
+        <div class="col-sm-3">
+            <select id="coordinater2" class="form-control"required>
+                <option value="">--select--</option>
+            </select>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Co-Ordinater 3</label>
+        </div>
+        <div class="col-sm-3">
+            <select id="coordinater3" class="form-control"required>
+                <option value="">--select--</option>
+            </select>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Volunteer 1</label>
+        </div>
+        <div class="col-sm-3">
+            <select id="valenteer1" class="form-control"required>
+                <option value="">--select--</option>
+            </select>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Volunteer 2</label>
+        </div>
+        <div class="col-sm-3">
+            <select id="valenteer2" class="form-control"required>
+                <option value="">--select--</option>
+            </select>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Volunteer 3</label>
+        </div>
+        <div class="col-sm-3">
+            <select id="valenteer3" class="form-control"required>
+                <option value="">--select--</option>
+            </select>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Image</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="file" name="file" id="file" placeholder="" required>
+
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-5"></div>
+        <div class="col-sm-3">
+            <button type="submit" id="submit"  class="btn btn-success">ADD</button>&nbsp;&nbsp;
+            <button type="reset"  class="btn btn-success">CANCEL</button>
+        </div>
+
+        <div class="col-sm-3"></div>
+    </div><br><br>
+	</form>
+</body>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+
+                    resolve(this.responseText);
+                }
+
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getFestPromise = performAjax("GET", "http://localhost:5000/admin/viewfest");
+        getFestPromise
+            .then((FestList) => {
+                getFestList(FestList);
+                loadData2();
+                val1();
+                val2();
+                valt3();
+                cord2();
+                cord3();
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function getFestList(Data) {
+        let name = document.getElementById("festname");
+        const ct = JSON.parse(Data);
+        for (let i = 0; i < ct.length; i++) {
+            const qaopt = document.createElement("OPTION");
+            qaopt.innerHTML = ct[i].festname;
+            qaopt.value = ct[i].festname;
+            name.options.add(qaopt);
+        }
+    }
+
+    function loadData2() {
+        const getFestPromise = performAjax("GET", "http://localhost:5000/admin/vieworganizers");
+        getFestPromise
+            .then((FestList) => {
+                pp(FestList);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function cord3() {
+
+        const getCoPromise = performAjax("GET", "http://localhost:5000/admin/vieworganizers");
+        getCoPromise
+            .then((coList) => {
+                coordinatdata3(coList);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function coordinatdata3(Data) {
+        let coordinater = document.getElementById("coordinater3");
+        const ct = JSON.parse(Data);
+        for (let i = 0; i < ct.length; i++) {
+            const qaopt = document.createElement("OPTION");
+            qaopt.innerHTML = ct[i].name;
+            qaopt.value = ct[i].name;
+            coordinater.options.add(qaopt);
+        }
+    }
+
+    function cord2() {
+        const getFestPromise = performAjax("GET", "http://localhost:5000/admin/vieworganizers");
+        getFestPromise
+            .then((FestList) => {
+                coordinatdata2(FestList);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function coordinatdata2(Data) {
+        let coordinater = document.getElementById("coordinater2");
+        const ct = JSON.parse(Data);
+        for (let i = 0; i < ct.length; i++) {
+            const qaopt = document.createElement("OPTION");
+            qaopt.innerHTML = ct[i].name;
+            qaopt.value = ct[i].name;
+            coordinater.options.add(qaopt);
+        }
+    }
+
+    function pp(Data) {
+        let coordinater = document.getElementById("coordinater1");
+        const ct = JSON.parse(Data);
+        for (let i = 0; i < ct.length; i++) {
+            const qaopt = document.createElement("OPTION");
+            qaopt.innerHTML = ct[i].name;
+            qaopt.value = ct[i].name;
+            coordinater.options.add(qaopt);
+        }
+    }
+
+    function val1() {
+        const getRegPromise = performAjax("GET", "http://localhost:5000/Student/viewstudent");
+        getRegPromise
+            .then((regList) => {
+                getList(regList);
+
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function getList(Data) {
+        let jj = document.getElementById("valenteer1");
+        const ct = JSON.parse(Data);
+        for (let i = 0; i < ct.length; i++) {
+            const qaopt = document.createElement("OPTION");
+            qaopt.innerHTML = ct[i].studentname;
+            qaopt.value = ct[i].studentname;
+            jj.options.add(qaopt);
+        }
+    }
+
+    function val2() {
+        const getReggPromise = performAjax("GET", "http://localhost:5000/Student/viewstudent");
+        getReggPromise
+            .then((reggList) => {
+                getvalList(reggList);
+
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function getvalList(Data) {
+        let jj = document.getElementById("valenteer2");
+        const ct = JSON.parse(Data);
+        for (let i = 0; i < ct.length; i++) {
+            const qaopt = document.createElement("OPTION");
+            qaopt.innerHTML = ct[i].studentname;
+            qaopt.value = ct[i].studentname;
+            jj.options.add(qaopt);
+        }
+    }
+
+    function valt3() {
+        const getValPromise = performAjax("GET", "http://localhost:5000/Student/viewstudent");
+        getValPromise
+            .then((reggList) => {
+                getvallList(reggList);
+
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function getvallList(Data) {
+        let jj = document.getElementById("valenteer3");
+        const ct = JSON.parse(Data);
+        for (let i = 0; i < ct.length; i++) {
+            const qaopt = document.createElement("OPTION");
+            qaopt.innerHTML = ct[i].studentname;
+            qaopt.value = ct[i].studentname;
+            jj.options.add(qaopt);
+        }
+    }
+
+    function addEvent() {
+        event.preventDefault();
+        const festname = document.getElementById("festname").value;
+        const eventname = document.getElementById("eventname").value;
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+        const coordinater1 = document.getElementById("coordinater1").value;
+        const coordinater2 = document.getElementById("coordinater2").value;
+        const coordinater3 = document.getElementById("coordinater3").value;
+        const valenteer1 = document.getElementById("valenteer1").value;
+        const valenteer2 = document.getElementById("valenteer2").value;
+        const valenteer3 = document.getElementById("valenteer3").value;
+        const file = document.getElementById("file").files;
+        if (file.length > 0) {
+            var fileToLoad = file[0];
+            var fileReader = new FileReader();
+            fileReader.onload = function (fileLoadedEvent) {
+                const filepath = fileLoadedEvent.target.result;
+                const getSendFilePromise = performAjax(
+                    "POST",
+                    "http://localhost:5000/Organizer/events",
+                    JSON.stringify({ festname, eventname, date, time, coordinater1, coordinater2, coordinater3, valenteer1, valenteer2, valenteer3, file: filepath })
+                );
+                getSendFilePromise
+                    .then((sendFilePromise) => {
+                        alert('Image upload  Successfully');
+                        empty();
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    })
+
+            }
+            fileReader.readAsDataURL(fileToLoad);
+        }
+    }
+
+    function empty() {
+        event.preventDefault();
+        document.getElementById("festname").value = "";
+        document.getElementById("eventname").value = "";
+        document.getElementById("date").value = "";
+        document.getElementById("time").value = "";
+        document.getElementById("coordinater1").value = "";
+        document.getElementById("coordinater2").value = "";
+        document.getElementById("coordinater3").value = "";
+        document.getElementById("valenteer1").value = "";
+        document.getElementById("valenteer2").value = "";
+        document.getElementById("valenteer3").value = "";
+        document.getElementById("file").value = "";
+    }
+</script>

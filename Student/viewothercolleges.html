@@ -1,0 +1,88 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<html>
+<style>
+    .tablecss {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .tablecss td,
+    .tablecss th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .tablecss tr:nth-child(odd) {
+        background-color: #f2f2f2;
+    }
+
+    .tablecss tr:hover {
+        background-color: #ddd;
+    }
+
+    .tablecss th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: center;
+        background-color: lavender;
+        color: black;
+        font-weight: bold;
+    }
+</style>
+
+<body onload="loadData()">
+    <center>
+        <table id="othercollegesdetails" class="tablecss" style="width:95%;"></table>
+    </center>
+</body>
+<script>
+    let records = [];
+
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getFilesPromise = performAjax("GET", "http://localhost:5000/admin/viewothercolleges");
+        getFilesPromise
+            .then((FestList) => {
+                showFestDetails(FestList);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function showFestDetails(data) {
+        records = JSON.parse(data);
+        let tableRow = '';
+        const tableHeader = `<tr style="background: lavender;"><th>S.No.</th><th>Festname</th><th>College</th><th>Startfrom</th><th>End</th><th>Contactno</th><th>Email</th><th>Website</th><th>File</th></tr>`;
+        if (records.length > 0) {
+            tableRow = records.map((rec, index) => {
+                return `<tr><td align="right">${index + 1}</td><td>${rec.festname}</td><td>${rec.college}</td><td>${rec.startsfrom}</td><td>${rec.endon}</td><td>${rec.contactno}</td><td>${rec.email}</td><td>${rec.website}</td><td><img src="${rec.file}" height="80" width="100"></td></tr>`;
+            });
+            document.getElementById("othercollegesdetails").innerHTML = `${tableHeader}${tableRow.join('')}`;
+        }
+    }
+</script>

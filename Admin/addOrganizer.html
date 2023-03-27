@@ -1,0 +1,163 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<style>
+    .form-control {
+        border-radius: 15px;
+    }
+</style>
+
+<body style="font-family: verdena;">
+<form onsubmit="addorganizer()">
+    <div class="row">
+        <h3 style="text-align: center"><b>Add Organizers and Co-Ordinators</b></h3>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Name</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="name" id="name" class="form-control" placeholder="enter name" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">User Name</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="uname" id="username" class="form-control" placeholder="enter username" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Designation</label>
+        </div>
+        <div class="col-sm-3">
+
+            <input type="text" name="designation" id="designation" class="form-control"
+                placeholder="enter ur designation" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Branch</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="branch" id="branch" class="form-control" placeholder="enter ur branch" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Email Id</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="email" name="email" id="email" class="form-control" placeholder="e.g.honey123@gmail.com"
+                required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Contact No.</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="contact no" id="contactno" class="form-control" placeholder="enter ur contactno"
+                maxlength="10"required pattern="[6-9]{1}[0-9]{9}">
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Type</label>
+        </div>
+        <div class="col-sm-3">
+            <select name="select" id="selectname" class="form-control"required>
+                <option value="">--Select--</option>
+                <option value="Organizer">Organizer</option>
+                <option value="Co-Ordinater">Co-Ordinater</option>
+            </select></div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-3">
+            <button type="submit"  id="submit" class="btn btn-success ">ADD</button>&nbsp;&nbsp;
+            <button type="reset"  class="btn btn-success">CANCEL</button>
+        </div>
+        <div class="col-sm-2"></div>
+    </div><br><br>
+	</form>
+</body>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function addorganizer() {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const username = document.getElementById("username").value;
+        const designation = document.getElementById("designation").value;
+        const branch = document.getElementById("branch").value;
+        const email = document.getElementById("email").value;
+        const contactno = document.getElementById("contactno").value;
+        const selectname = document.getElementById("selectname").value;
+        
+        const addOrganizerPromise = performAjax(
+            "POST",
+            "http://localhost:5000/admin/organizers",
+            JSON.stringify({ name, username, designation, branch, email, contactno, selectname })
+        );
+        addOrganizerPromise
+            .then(newOrganizersList => {
+                alert("succefully added");
+                cancel();
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+        
+    }
+
+    function cancel() {
+        event.preventDefault();
+        document.getElementById("name").value = "";
+        document.getElementById("username").value = "";
+        document.getElementById("designation").value = "";
+        document.getElementById("branch").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("contactno").value = "";
+        document.getElementById("selectname").value = "";
+    }
+</script>

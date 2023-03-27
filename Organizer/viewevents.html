@@ -1,0 +1,263 @@
+<html>
+<title>College Fest</title>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <style>
+        .tablecss {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .tablecss td,
+        .tablecss th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .tablecss tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        .tablecss tr:hover {
+            background-color: #ddd;
+        }
+
+        .tablecss th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: lavender;
+            color: black;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<script>
+    let viewevents = [];
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+
+    function LoadApplication() {
+        const getdata = performAjax("GET", "http://localhost:5000/Organizer/viewevents");
+        getdata
+            .then((profile) => {
+
+                LoadEvents(profile);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function LoadEvents(records) {
+        viewevents = JSON.parse(records);
+        const tableHeader = `<tr><th>Sno</th><th>Fest Name</th><th>Vvent Name</th><th>Date</th><th>Time</th><th>Co-Ordinater1</th><th>Co-Ordinater2</th><th>Co-Ordinater3</th><th>Valenteer1</th><th>Valenteer2</th><th>Valenteer3</th><th>Image</th><th>Actions</th></tr>`;
+        const  tableRow = viewevents.map((details, index) => {
+            const deleteButton = `<button id="${details._id}"
+             onclick="deleteFile(event)" style="color:red"  class="glyphicon glyphicon-trash"></button>`;
+            const editButton = `<button id="${details._id}" onclick="editEvent(event)" style="color:green"  class="glyphicon glyphicon-pencil" data-toggle="modal" data-target="#myModal"></button>`;
+            return `<tr><td>${index + 1}</td><td>${details.festname}</td> <td>${details.eventname}</td> <td>${details.date}</td><td>${details.time}</td>  
+                <td>${details.coordinater1}</td> <td>${details.coordinater2}</td> <td>${details.coordinater3}</td> <td>${details.valenteer1}</td><td>${details.valenteer2}</td><td>${details.valenteer3}</td> <td><img src="${details.file}" style="height:70px;width:70px"></td><td>&nbsp;${editButton}&nbsp;&nbsp;${deleteButton}&nbsp;</td></tr>`;
+        });
+        document.getElementById("viewevent").innerHTML = `${tableHeader}${tableRow.join('')}`;
+    }
+
+    function editEvent(event) {
+        event.preventDefault();
+        let editRecord;
+        viewevents.map(events => {
+            if (events._id === event.target.id) {
+                editRecord = events;
+            }
+        });
+        if (editRecord !== undefined) {
+            document.getElementById("id").value = editRecord._id;
+            document.getElementById("festname").value = editRecord.festname;
+            document.getElementById("eventname").value = editRecord.eventname;
+            document.getElementById("date").value = editRecord.date;
+            document.getElementById("time").value = editRecord.time;
+            document.getElementById("coordinater1").value = editRecord.coordinater1;
+            document.getElementById("coordinater2").value = editRecord.coordinater2;
+            document.getElementById("coordinater3").value = editRecord.coordinater3;
+            document.getElementById("valenteer1").value = editRecord.valenteer1;
+            document.getElementById("valenteer2").value = editRecord.valenteer2;
+            document.getElementById("valenteer3").value = editRecord.valenteer3;
+        }
+        else {
+            alert("Agents not Found");
+        }
+    }
+
+    function Update(event) {
+        event.preventDefault();
+        const id = document.getElementById("id").value;
+        const festname = document.getElementById("festname").value;
+        const eventname = document.getElementById("eventname").value;
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+        const coordinater1 = document.getElementById("coordinater1").value;
+        const coordinater2 = document.getElementById("coordinater2").value;
+        const coordinater3 = document.getElementById("coordinater3").value;
+        const valenteer1 = document.getElementById("valenteer1").value;
+        const valenteer2 = document.getElementById("valenteer2").value;
+        const valenteer3 = document.getElementById("valenteer3").value;
+        const getUpdatePromise = performAjax(
+            "PUT",
+            `http://localhost:5000/Organizer/updateevents/${id}`,
+            JSON.stringify({ festname, eventname, date, time, coordinater1, coordinater2, coordinater3, valenteer1, valenteer2, valenteer3 })
+        );
+
+        getUpdatePromise
+            .then(updatedList => {
+                alert('Details Updated');
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function deleteFile(event) {
+        const deletePromise = performAjax("DELETE", `http://localhost:5000/Organizer/deleteFest/${event.target.id}`);
+        deletePromise
+            .then((remainingevent) => {
+                alert("deleted");
+                LoadApplication();
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+</script>
+
+<body onload="LoadApplication()">
+<form onsubmit="Update(event)">
+    <center>
+        <table id="viewevent" border="2" style="width:95%;" class="tablecss"></table>
+    </center>
+
+    <div class="modal fade" id="myModal" role="dialog" width="100%">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background-color:rgb(236, 221, 221)">
+                <div class="modal-header" style="background-color:rgb(172, 76, 172)">
+                    <button type="button" style="background-color:white" class="close"
+                        data-dismiss="modal">&times;</button>
+                    <center>
+                        <font style="color:white">
+                            <h4>View events</h4>
+                        </font>
+                    </center>
+                </div>
+                <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <input type="hidden" class="form-control" name="name" id="id"
+                                    placeholder="enter id">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label> festname</label><br>
+                                    <input type="text" class="form-control" name="festname" id="festname"
+                                        placeholder=""required>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label> eventname:</label><br>
+                                    <input type="text" class="form-control" name="eventname" id="eventname"
+                                        placeholder=""required>
+                                </div>
+
+                                <div class="col-sm-3">
+                                </div>
+                            </div><br>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <label>date:</label><br>
+                                    <input type="date" class="form-control" name="date" id="date" placeholder=""required>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label> Time :</label><br>
+                                    <input type="time" class="form-control" name="time" id="time" placeholder=""required>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label> Coordinater1:</label><br>
+                                    <input type="text" class="form-control" name="coordinater" id="coordinater1"
+                                        placeholder=""required>
+                                </div>
+                            </div><br>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label> Coordinater2:</label><br>
+                                    <input type="text" class="form-control" name="coordinater2" id="coordinater2"
+                                        placeholder=""required>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label>Coordinater3:</label><br>
+                                    <input type="text" class="form-control" name="coordinater3" id="coordinater3"
+                                        placeholder=""required>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label>Valenteer1:</label><br>
+                                    <input type="text" class="form-control" name="valenteer1" id="valenteer1"
+                                        placeholder=""required>
+                                </div>
+                            </div><br>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                </div>
+                                <div class="col-sm-3">
+                                    <label>valenteer2:</label><br>
+                                    <input type="text" class="form-control" name="valenteer2" id="valenteer2"
+                                        placeholder=""required></div>
+                                <div class="col-sm-3">
+                                    <label>valenteer3:</label><br>
+                                    <input type="text" class="form-control" name="valenteer3" id="valenteer3"
+                                        placeholder=""required>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-4"></div>
+
+                                    <div class="col-sm-4">
+                                        <button type="submit" id="btnupdate" 
+                                            class="btn btn-success" >UPDATE</button>&nbsp;
+                                    </div>
+                                    <div class="col-sm-4"></div>
+                                </div><br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	</form>
+</body>
+
+</html>

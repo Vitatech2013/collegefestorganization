@@ -1,0 +1,171 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<style>
+    .form-control {
+        border-radius: 15px;
+    }
+</style>
+
+<body onload="loadData()" style="font-family: verdena;">
+<form onsubmit="Addfest()">
+    <h3 style="text-align: center"><b>Add Fest</b></h3>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Fest Name</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="fname" id="festname" class="form-control" placeholder="enter fest name" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Start From</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="date" name="startfrom" id="startfrom" class="form-control" placeholder="" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Ends On</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="date" name="end" id="end" class="form-control" placeholder="" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Description</label>
+        </div>
+        <div class="col-sm-3">
+            <textarea id="description" placeholder="ente description" rows="4" class="form-control"required></textarea>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Organizer</label>
+        </div>
+        <div class="col-sm-3">
+            <select name="username" id="username" class="form-control"required>
+                <option value="">--Select--</option>
+            </select></div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-2">
+            <label for="">Image</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="file" id="file" accept="image/*"required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-5"></div>
+        <div class="col-sm-3">
+            <button type="submit" id="submit" class="btn btn-success ">ADD</button>&nbsp;&nbsp;
+            <button type="reset" class="btn btn-success ">CANCEL</button>
+        </div>
+
+        <div class="col-sm-3"></div>
+    </div>
+	</form>
+</body>
+<script>
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function loadData() {
+        const getFestPromise = performAjax("GET", "http://localhost:5000/admin/vieworganizers");
+        getFestPromise
+            .then((FestList) => {
+                getUsernames(FestList);
+            })
+            .catch(err => {
+                alert(err.message);
+            })
+    }
+
+    function getUsernames(Data) {
+        let coordinater = document.getElementById("username");
+        const ct = JSON.parse(Data);
+        for (let i = 0; i < ct.length; i++) {
+            const qaopt = document.createElement("OPTION");
+            qaopt.innerHTML = ct[i].username;
+            qaopt.value = ct[i].username;
+            coordinater.options.add(qaopt);
+        }
+    }
+
+    function Addfest() {
+        event.preventDefault();
+        const festname = document.getElementById("festname").value;
+        const startfrom = document.getElementById("startfrom").value;
+        const end = document.getElementById("end").value;
+        const description = document.getElementById("description").value;
+        const username = document.getElementById("username").value;
+        const file = document.getElementById("file").files;
+        if (file.length > 0) {
+            var fileToLoad = file[0];
+            var fileReader = new FileReader();
+            fileReader.onload = function (fileLoadedEvent) {
+                const filepath = fileLoadedEvent.target.result;
+                const getSendFilePromise = performAjax(
+                    "POST",
+                    `http://localhost:5000/admin/fests`,
+                    JSON.stringify({ festname, startfrom, end, description, username, file: filepath })
+                );
+                getSendFilePromise
+                    .then((sendFilePromise) => {
+                        alert('Fests  Successfully Added');
+                        empty();
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    })
+
+            }
+            fileReader.readAsDataURL(fileToLoad);
+        }
+    }
+
+    function empty() {
+        event.preventDefault();
+        document.getElementById("festname").value = "";
+        document.getElementById("startfrom").value = "";
+        document.getElementById("end").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("username").value = "";
+    }
+</script>

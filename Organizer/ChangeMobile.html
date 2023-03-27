@@ -1,0 +1,122 @@
+<html>
+<title>online book store</title>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+
+<html>
+        <title></title>
+        
+        <head>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        
+            <style>
+                .form-control {
+                    border: 2px solid black;
+                }
+            </style>
+        <script>
+           
+        
+            const email = sessionStorage.getItem('email');
+          
+            const userid=sessionStorage.getItem("id")
+            function performAjax(httpMethod, url, params) {
+                const myPromise = new Promise((resolve, reject) => {
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            resolve(this.responseText);
+        
+                        }
+                        if (this.status == 500) {
+                            reject({ error: true, message: "ServerError" });
+                        }
+                        if (this.status == 404) {
+                            reject({ error: true, message: "Resource not found" });
+                        }
+                    };
+                    xhttp.open(httpMethod, url, true);
+                    xhttp.setRequestHeader("Content-Type", "application/json");
+                    params ? xhttp.send(params) : xhttp.send();
+                });
+                return myPromise;
+            }
+        
+        
+        
+            function EmailId() {
+                document.getElementById("email").value = email;
+            }
+            function changeMobileNo() {
+                event.preventDefault();
+                const oldmbl = document.getElementById("mobile").value;
+                const newMobileNo= document.getElementById("newmobile").value;
+            if(oldmbl === sessionStorage.getItem("contactno")) {
+                const getUpdatePromise = performAjax(
+                    "PUT",
+                    `http://localhost:5000/Organizer/updatemobileno/${userid}`,
+                    JSON.stringify({ contactno:newMobileNo })
+                );
+                getUpdatePromise
+                .then((updatePromise) => {
+                    alert('Details Updated');
+                    sessionStorage.setItem("mobile", newMobileNo);
+                })
+                .catch(err => {
+                    alert(err.message);
+                })
+            }
+            else {
+                alert('Old MobileNo Not Matched');
+            }
+                    
+                }
+              
+        </script>
+</head>
+<body onload="EmailId()" style="font-family:verdena;">
+    <br>
+   <form onsubmit="changeMobileNo()"> 
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-1"><label for="emailid">EmailId:</label></div>
+        <div class="col-sm-3"><input type="text" name="email" disabled="false" class="form-control" id="email" placeholder="enter user name" required></div>
+        <div class="col-sm-4"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-1"><label for="old mobile">Old MobileNo:</label></div>
+        <div class="col-sm-3"><input type="number" name="MobileNo" class="form-control" id="mobile" placeholder="" required></div>
+        <div class="col-sm-4"></div>
+    </div><br>
+    <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-1"><label for="new monile">New MobileNo:</label></div>
+            <div class="col-sm-3"><input type="number" name="mobile" class="form-control" id="newmobile" placeholder="" required></div>
+            <div class="col-sm-4"></div>
+        </div><br>
+        
+       
+        <div class="row">
+            <div class="col-sm-5"></div>
+            <div class="col-sm-3">
+                  <button type="submit"  class="btn btn-success">ChangeMobileNumber</button>
+               
+          </div>
+            <div class="col-sm-4"></div>
+        </div><br>
+       </form>
+</body>
+
+</html>

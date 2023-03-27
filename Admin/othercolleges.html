@@ -1,0 +1,198 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<style>
+    .form-control {
+        border-radius: 15px;
+    }
+</style>
+
+<body style="font-family: verdena;"><br>
+<form onsubmit="AddOthercolleges()">
+    <div class="row">
+
+        <h3 style="text-align: center"><b>Other College Fests</b></h3>
+
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for=""></label>
+        </div>
+        <div class="col-sm-3">
+            <input type="hidden" name="id" id="id" class="form-control" placeholder="enter fest name" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for="">Fest Name</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="fname" id="festname" class="form-control" placeholder="enter fest name" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for="">College Name</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="cname" id="college" class="form-control" placeholder="enter college name" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for="">Start From</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="date" name="date" id="startsfrom" class="form-control" placeholder="" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for="">Ends On </label>
+        </div>
+        <div class="col-sm-3">
+            <input type="date" name="end" id="endon" class="form-control" placeholder="" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for="">Contact No.</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="contactno" id="contactno" class="form-control" placeholder="enter ur contactno"
+                maxlength="10"required pattern="[6-9]{1}[0-9]{9}">
+
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for="">Email Id</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="email" name="email" id="email" class="form-control" placeholder="e.g.honey123@gmail.com"
+                 required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for="">Website</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" name="website" id="website" class="form-control" placeholder="http:\\" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+    <div class="row">
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+            <label for="">Image</label>
+        </div>
+        <div class="col-sm-3">
+            <input type="file" name="image" id="file" placeholder="" required>
+        </div>
+        <div class="col-sm-3"></div>
+    </div><br>
+
+    <div class="row">
+        <div class="col-sm-5"></div>
+        <div class="col-sm-3">
+            <button type="submit" id="submit"
+                class="btn btn-success">Add</button>&nbsp;&nbsp;
+            <button type="reset" class="btn btn-success">Cancel</button>
+        </div>
+
+        <div class="col-sm-4"></div>
+    </div><br><br>
+	</form>
+</body>
+
+<script>
+
+    function performAjax(httpMethod, url, params) {
+        const myPromise = new Promise((resolve, reject) => {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                }
+                if (this.status == 500) {
+                    reject({ error: true, message: "ServerError" });
+                }
+                if (this.status == 404) {
+                    reject({ error: true, message: "Resource not found" });
+                }
+            };
+            xhttp.open(httpMethod, url, true);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            params ? xhttp.send(params) : xhttp.send();
+        });
+        return myPromise;
+    }
+
+    function AddOthercolleges() {
+        event.preventDefault();
+        const festname = document.getElementById("festname").value;
+        const college = document.getElementById("college").value;
+        const startsfrom = document.getElementById("startsfrom").value;
+        const endon = document.getElementById("endon").value;
+        const contactno = document.getElementById("contactno").value;
+        const email = document.getElementById("email").value;
+        const website = document.getElementById("website").value;
+        const image = document.getElementById("file").files;
+
+        if (image.length > 0) {
+            var imageToLoad = image[0];
+            var imageReader = new FileReader();
+            imageReader.onload = function (imageLoadedEvent) {
+                const imagepath = imageLoadedEvent.target.result;
+                const getRegPromise = performAjax(
+                    "POST",
+                    `http://localhost:5000/Admin/othercolleges`,
+                    JSON.stringify({ festname, college, startsfrom, endon, contactno, email, website, file: imagepath })
+                );
+                getRegPromise
+                    .then((regPromise) => {
+                        alert('Added Successfully ');
+                        empty();
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    })
+            }
+            imageReader.readAsDataURL(imageToLoad);
+        }
+    }
+
+    function empty() {
+        event.preventDefault();
+        document.getElementById("festname").value = "";
+        document.getElementById("college").value = "";
+        document.getElementById("startsfrom").value = "";
+        document.getElementById("endon").value = "";
+        document.getElementById("contactno").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("website").value = "";
+
+
+
+    }
+
+</script>
